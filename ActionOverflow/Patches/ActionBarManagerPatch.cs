@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Runtime.CompilerServices;
-using System.Collections;
 
 namespace ActionOverflow.Patches
 {
@@ -18,20 +17,27 @@ namespace ActionOverflow.Patches
         [HarmonyPostfix]
         private static void AddSlotsPatch(ref ActionBarManager __instance)
         {
+            // Resizing arrays originally created with 6 slots in mind
             Array.Resize(ref __instance._actionSlotTransforms, 12);
             Array.Resize(ref actionSlotsRef(__instance), 12);
 
+            // Clone original action bar to repopulate with new slots
             GameObject bottombar = UnityEngine.Object.Instantiate(GameObject.Find("_cell_actionBar"));
             GameObject dolly = GameObject.Find("dolly_bottomBar");
+
             bottombar.transform.SetParent(dolly.transform);
             bottombar.name = "_cell_actionBar2";
-            bottombar.transform.position = new Vector3(960f, 169f, 0);
+            bottombar.transform.position = new Vector3(960f, 144f, 0);
+
+            // Empty cloned slots in newly created bottom bar
             for (int i = bottombar.transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = bottombar.transform.GetChild(i);
                 UnityEngine.Object.Destroy(child.gameObject);
             }
 
+            // Build each slot from a clone of the first one (_actionSlot_00)
+            // Reconfigure relevant data to be unique to the index.
             for (int i = 6; i < 12; i++)
             {
 
@@ -40,30 +46,17 @@ namespace ActionOverflow.Patches
                 GameObject new_slot_GO = UnityEngine.Object.Instantiate(GameObject.Find("_actionSlot_00"));
                 
                 new_slot_GO.transform.SetParent(bottombar.transform);
+
                 Vector3 current_transform = new_slot_GO.transform.position;
-                Vector3 new_transformation = new Vector3(981.6442f + 116.022f * (i - 6), 244f, 0);
+                Vector3 new_transformation = new Vector3(981.6442f + 116.022f * (i - 6), 234f, 0);
+
                 new_slot_GO.transform.position = new_transformation;
                 new_slot_GO.name = name;
-
-                RectTransform rect = new_slot_GO.GetComponent<RectTransform>();
-                
-                // configure transform
-                rect.name = name;
-                rect.anchoredPosition = new Vector2(35f + 70*(i-6), -50f);
-                rect.anchoredPosition3D = new Vector3(35f + 70 * (i - 6), -50f, 0f);
-                rect.anchorMax = new Vector2(0f, 1f);
-                rect.anchorMin = new Vector2(0f, 1f);
-                
-                rect.offsetMax = new Vector2(63.84f + 70f*(i - 6), 10f);
-                rect.offsetMin = new Vector2(3.8243f + 70f*(i -  6), -50f);
-                rect.pivot = new Vector2(0.5f, 0.5f);
-
-                rect.sizeDelta = new Vector2(60f, 60f);
-                rect.position = new Vector3(989.962f + 116.022f*(i-6), 244f, 0);
 
                 // configure actionslot
                 new_slot_GO.GetComponent<ActionSlot>().name = name;
                 string actionslothotkeytext;
+
                 switch (i)
                 {
                     case 6:
@@ -85,33 +78,11 @@ namespace ActionOverflow.Patches
 
                 // Assign default values for required fields
                 new_slot_GO.GetComponent<ActionSlot>()._scriptSkill = null; // No skill assigned initially
-                //new_slot_GO.GetComponent<ActionSlot>()._skillIcon = newslot.AddComponent<Image>(); // Add an Image component for the skill icon
                 new_slot_GO.GetComponent<ActionSlot>()._skillIcon.sprite = ActionBarManager._current._emptySkillIcon; // Assign default empty icon
 
-                // event reflection
-                
+                // TODO: Event argument mod
 
-                EventTrigger trigger = new_slot_GO.GetComponent<EventTrigger>();
-
-
-                if (trigger != null)
-                {
-                    // first one
-                    var entry = trigger.triggers[0];
-                    // this is going to suck
-                    //get callback
-                    FieldInfo callback = entry.GetType().GetField("callback", BindingFlags.NonPublic | BindingFlags.Instance);
-                    EventTrigger.TriggerEvent callback_instance = (EventTrigger.TriggerEvent)callback.GetValue(entry);
-
-                    FieldInfo m_Calls = typeof(UnityEventBase).GetType().GetField("m_Calls", BindingFlags.NonPublic | BindingFlags.Instance);    
-                    var m_Calls_instance = m_Calls.GetValue(callback_instance);
-
-                    FieldInfo m_ExecutingCallsField = m_Calls_instance.GetType().GetField("m_ExecutingCalls", BindingFlags.NonPublic | BindingFlags.Instance);
-                    var executingCalls = m_ExecutingCallsField.GetValue(m_Calls_instance) as IList;
-
-                }
-
-                __instance._actionSlotTransforms[i] = rect;
+                __instance._actionSlotTransforms[i] = (RectTransform)new_slot_GO.transform;
                 actionSlotsRef(__instance)[i] = new_slot_GO.GetComponent<ActionSlot>();
             }
 
@@ -121,13 +92,8 @@ namespace ActionOverflow.Patches
         [HarmonyPostfix]
         private static void HandleActionkeysPatch(ref ActionBarManager __instance, ref ActionSlot[] ____actionSlots)
         {
-            if (!ActionOverflowConfig.barToggle)
-            {
-                //ChatBehaviour._current.New_ChatMessage("Falling out of ActionKeysPatch");
-                return;
-            }
+            if (!ActionOverflowConfig.barToggle) return;
 
-            // _actionSlots[0]._actionSlotHotkey.text = InputControlManager.current.actionBar_0.ToString();
             ____actionSlots[6]._actionSlotHotkey.text = ActionOverflowConfig.action6Key.Value.ToString();
             ____actionSlots[7]._actionSlotHotkey.text = ActionOverflowConfig.action7Key.Value.ToString();
             ____actionSlots[8]._actionSlotHotkey.text = ActionOverflowConfig.action8Key.Value.ToString();
@@ -145,7 +111,8 @@ namespace ActionOverflow.Patches
                 ActionOverflowConfig.action11Key.Value,
             };
 
-
+            for (int i = 6; i < 12; i++) 
+            {
                 int localIndex = i - 6;
                 KeyCode slotKey = extraKeys[localIndex];
 
