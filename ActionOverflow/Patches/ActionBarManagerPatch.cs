@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using System.Globalization;
 using System.Reflection;
 using Unity.TLS;
 using UnityEngine;
@@ -98,16 +99,32 @@ namespace ActionOverflow.Patches
                 }
 
                 // Replace the entire callback
-                var existingEntry = entry.triggers[0];
-                existingEntry.callback = new EventTrigger.TriggerEvent();
+                // Skill_ToolTip event
+                var skilltooltip_entry = entry.triggers[0];
+                
+                skilltooltip_entry.callback = new EventTrigger.TriggerEvent();
 
-                MethodInfo methodInfo = typeof(ActionBarManager).GetMethod("Init_SkillToolTip", BindingFlags.Public | BindingFlags.Instance);
-                if (methodInfo != null)
+                MethodInfo methodInfo1 = typeof(ActionBarManager).GetMethod("Init_SkillToolTip", BindingFlags.Public | BindingFlags.Instance);
+                
+                if (methodInfo1 != null)
                 {
-                    CachedInvokableCall<int> newInvoker = new CachedInvokableCall<int>(__instance, methodInfo, i);
+                    CachedInvokableCall<int> newInvoker = new CachedInvokableCall<int>(__instance, methodInfo1, i);
 
-                    existingEntry.callback.AddListener((eventData) => newInvoker.Invoke(i));
+                    skilltooltip_entry.callback.AddListener((eventData) => newInvoker.Invoke(i));
                 }
+
+                // Click events
+                var onclick_entry = entry.triggers[2];
+                onclick_entry.callback = new EventTrigger.TriggerEvent();
+                MethodInfo methodInfo2 = typeof(ActionBarManager).GetMethod("OnClick_ActionSlot", BindingFlags.Public | BindingFlags.Instance);
+
+                if (methodInfo2 != null)
+                {
+                    CachedInvokableCall<int> newInvoker2 = new CachedInvokableCall<int>(__instance, methodInfo2, i);
+
+                    onclick_entry.callback.AddListener((eventData) => newInvoker2.Invoke(i));
+                }
+
 
                 // Update action slot and action slot transform entries with new values
                 __instance._actionSlotTransforms[i] = (RectTransform)new_slot_GO.transform;
@@ -117,17 +134,17 @@ namespace ActionOverflow.Patches
         }
 
         [HarmonyPatch("Handle_Actionkeys")]
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         private static void HandleActionkeysPatch(ref ActionBarManager __instance, ref ActionSlot[] ____actionSlots)
         {
-            if (!ActionOverflowConfig.barToggle) return;
+            //if (!ActionOverflowConfig.barToggle) return;
 
-            ____actionSlots[6]._actionSlotHotkey.text = ActionOverflowConfig.action6Key.Value.ToString();
-            ____actionSlots[7]._actionSlotHotkey.text = ActionOverflowConfig.action7Key.Value.ToString();
-            ____actionSlots[8]._actionSlotHotkey.text = ActionOverflowConfig.action8Key.Value.ToString();
-            ____actionSlots[9]._actionSlotHotkey.text = ActionOverflowConfig.action9Key.Value.ToString();
-            ____actionSlots[10]._actionSlotHotkey.text = ActionOverflowConfig.action10Key.Value.ToString();
-            ____actionSlots[11]._actionSlotHotkey.text = ActionOverflowConfig.action11Key.Value.ToString();
+            ____actionSlots[6]._actionSlotHotkey.text = (____actionSlots[6]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action6Key.Value.ToString()[5..] : ActionOverflowConfig.action6Key.Value.ToString();
+            ____actionSlots[7]._actionSlotHotkey.text = (____actionSlots[7]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action7Key.Value.ToString()[5..] : ActionOverflowConfig.action7Key.Value.ToString();
+            ____actionSlots[8]._actionSlotHotkey.text = (____actionSlots[8]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action8Key.Value.ToString()[5..] : ActionOverflowConfig.action8Key.Value.ToString();
+            ____actionSlots[9]._actionSlotHotkey.text = (____actionSlots[9]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action9Key.Value.ToString()[5..] : ActionOverflowConfig.action9Key.Value.ToString();
+            ____actionSlots[10]._actionSlotHotkey.text = (____actionSlots[10]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action10Key.Value.ToString()[5..] : ActionOverflowConfig.action10Key.Value.ToString();
+            ____actionSlots[11]._actionSlotHotkey.text = (____actionSlots[11]._actionSlotHotkey.text.StartsWith("Alpha")) ? ActionOverflowConfig.action11Key.Value.ToString()[5..] : ActionOverflowConfig.action11Key.Value.ToString();
 
             KeyCode[] extraKeys = new KeyCode[]
             {
@@ -143,12 +160,11 @@ namespace ActionOverflow.Patches
             {
                 int localIndex = i - 6;
                 KeyCode slotKey = extraKeys[localIndex];
-
                 if (actionSlotsRef(__instance)[i] != null && actionSlotsRef(__instance)[i]._actionSlotHotkey != null)
                 {
-                    actionSlotsRef(__instance)[i]._actionSlotHotkey.text = slotKey.ToString();
+                    actionSlotsRef(__instance)[i]._actionSlotHotkey.text = (slotKey.ToString().StartsWith("Alpha")) ? slotKey.ToString()[5..] : slotKey.ToString();
                 }
-                    
+
                 if (Input.GetKeyDown(slotKey))
                 {
                     __instance.SendMessage("OnActionkeyPress", i);
