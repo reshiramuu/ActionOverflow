@@ -1,18 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D6FF8116-8DA3-4D18-B5BE-FE69A7504F81}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ActionOverflow</RootNamespace>
     <AssemblyName>ActionOverflow</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -22,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -30,51 +34,37 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <ATLYSS_PATH>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS</ATLYSS_PATH>
+    <R2MODMAN_ATLYSS_PROFILE_PATH>..\..\..\..\..\..\Users\rever\AppData\Roaming\r2modmanPlus-local\ATLYSS\profiles\Default</R2MODMAN_ATLYSS_PROFILE_PATH>
+    <ATLYSS_MANAGED>C:\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed</ATLYSS_MANAGED>
+    <ATLYSS_PLUGINS>C:\Users\rever\AppData\Roaming\r2modmanPlus-local\ATLYSS\profiles\Default\BepInEx\plugins</ATLYSS_PLUGINS>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\BepInEx\core\BepInEx.dll</HintPath>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all"/>
+    <PackageReference Include="BepInEx.Core" Version="5.*"/>
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*"/>
+    <PackageReference Include="UnityEngine.Modules" Version="2021.3.16" IncludeAssets="compile"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" Publicize="true">
+      <HintPath>$(ATLYSS_MANAGED)\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="EasySettings">
-      <HintPath>..\..\..\..\AppData\Roaming\r2modmanPlus-local\ATLYSS\profiles\Default\BepInEx\plugins\Nessie-EasySettings\EasySettings.dll</HintPath>
+      <HintPath>$(ATLYSS_PLUGINS)\Nessie-EasySettings\EasySettings.dll</HintPath>
     </Reference>
-    <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="Mirror">
+      <HintPath>$(ATLYSS_MANAGED)\Mirror.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="UnityEngine.UI" Publicize="true">
+      <HintPath>$(ATLYSS_MANAGED)\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ATLYSS\ATLYSS_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule" Publicize="true">
+      <HintPath>$(ATLYSS_MANAGED)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ActionOverflowConfig.cs" />
-    <Compile Include="Patches\ActionBarManagerPatch.cs" />
-    <Compile Include="Patches\PlayerCastingPatch.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

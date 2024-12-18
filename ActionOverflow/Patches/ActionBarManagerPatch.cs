@@ -1,11 +1,11 @@
 ﻿using HarmonyLib;
 using System;
 using System.Reflection;
+using Unity.TLS;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using System.Runtime.CompilerServices;
+using UnityEngine.EventSystems;
+
 
 namespace ActionOverflow.Patches
 {
@@ -78,10 +78,38 @@ namespace ActionOverflow.Patches
 
                 // Assign default values for required fields
                 new_slot_GO.GetComponent<ActionSlot>()._scriptSkill = null; // No skill assigned initially
-                new_slot_GO.GetComponent<ActionSlot>()._skillIcon.sprite = ActionBarManager._current._emptySkillIcon; // Assign default empty icon
+                new_slot_GO.GetComponent<ActionSlot>()._skillIcon.sprite = ActionBarManager._current._emptySkillIcon;
 
-                // TODO: Event argument mod
+                // Event trigger fix
+                var entry = new_slot_GO.GetComponent<EventTrigger>();
 
+                // Ensure the EventTrigger is initialized
+                if (entry.triggers == null)
+                    entry.triggers = new System.Collections.Generic.List<EventTrigger.Entry>();
+
+                if (entry.triggers.Count == 0)
+                {
+                    var newEntry = new EventTrigger.Entry
+                    {
+                        eventID = EventTriggerType.PointerClick,
+                        callback = new EventTrigger.TriggerEvent()
+                    };
+                    entry.triggers.Add(newEntry);
+                }
+
+                // Replace the entire callback
+                var existingEntry = entry.triggers[0];
+                existingEntry.callback = new EventTrigger.TriggerEvent();
+
+                MethodInfo methodInfo = typeof(ActionBarManager).GetMethod("Init_SkillToolTip", BindingFlags.Public | BindingFlags.Instance);
+                if (methodInfo != null)
+                {
+                    CachedInvokableCall<int> newInvoker = new CachedInvokableCall<int>(__instance, methodInfo, i);
+
+                    existingEntry.callback.AddListener((eventData) => newInvoker.Invoke(i));
+                }
+
+                // Update action slot and action slot transform entries with new values
                 __instance._actionSlotTransforms[i] = (RectTransform)new_slot_GO.transform;
                 actionSlotsRef(__instance)[i] = new_slot_GO.GetComponent<ActionSlot>();
             }
