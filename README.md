@@ -1,11 +1,11 @@
 # ActionOverflow 
 ATLYSS mod that adds an additional action bar. The slots for the new bar come with default binds, but these binds can be changed in the Mods in Settings. 
 
-# Requirements
+# Installation
+
+### Requirements
 - [BepInEx 5](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
 - [EasySettings](https://thunderstore.io/c/atlyss/p/Nessie/EasySettings/)
-
-# Installation
 
 ### Thunderstore
 The mod is available as a mod in the Thunderstore Mod Catalogue. This is the recommended way to install the mod.
