@@ -17,6 +17,6 @@ The mod is available as a mod in the Thunderstore Mod Catalogue. This is the rec
 - Run ATLYSS and verify installation success.
 
 # Support
-I am online on discord often incase anyone needs help installing the mod or has issues they want to report. My discord username is **reshirammu**. Additionally, there will be a corresponding thread for this mod on the official Atlss **#mod-showcase** channel.
+I am online on discord often incase anyone needs help installing the mod or has issues they want to report. My discord username is **reshirammu**. Additionally, there will be a corresponding thread for this mod on the community Atlyss [Discord](https://discord.gg/R6TMjKZP) **#mod-showcase** channel.
 
 ● ᴥ ●
