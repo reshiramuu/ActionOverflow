@@ -3,12 +3,12 @@ ATLYSS mod that adds an additional action bar. The slots for the new bar come wi
 
 # Installation
 
+### Thunderstore
+The mod is available as a mod in the Thunderstore Mod Catalogue. This is the recommended way to install the mod.
+
 ### Requirements
 - [BepInEx 5](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
 - [EasySettings](https://thunderstore.io/c/atlyss/p/Nessie/EasySettings/)
-
-### Thunderstore
-The mod is available as a mod in the Thunderstore Mod Catalogue. This is the recommended way to install the mod.
 
 ### Alternate Installation
 - [Install BepInEx](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
